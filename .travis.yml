@@ -1,0 +1,39 @@
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=false
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+
+deploy:
+    provider: releases
+    api_key:
+        # Note; this api_key is only valid for MikeInnes/BinaryenBuilder; you need
+        # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+        secure: ulmF7F/hPA3qZpF3VegvQ05x96GVVzZ30JZXa5g6WlOBNmmZYQFG5YYvvZnl7eCEvCKzbIh1OKFxy9Xxdr0JiFu0JwTJYx/+1IHeKw6kwDu+6Y2dzHZLdTk/+dGGDbsADtxfYCbjhglryDJhGb0RrCdiSYmGR00VCmHGu22unSYjZsGptZJPDTzD+PLtW912OxR2Mx9lenH2QUxZ1UoHDM0XQgZmd+DzxIsBOK4XcyXts+14+3FtgsXDshDH6sauzNt4gJARUpFdNYwX22iXgcOnpjtAl+dKeBAmMI6hlg/pt2Pz6Nh4NYX/fnyiOl1+g7awHcqzI+qTj8k0Q2lPsmWA+Vmt67zuD4ziFkTlpOSAiRrhRuJNpuo92sUXL1VO0zFcQuxWNwW48ADB5cZE6cFb29eVPwHculIq2KOA+LqgRSS2wxtmIlXTanMJahD/xEi/a3x7685RyWZGHwgurzVJRD535HarxDW3QRHYMQQekLWWYSV1g0aY9BAv36im2g8DtvaNsbHr6QMelNP6IzyXZs3adFDJydl7IO/2TIqqEOcqUHPUyPi4CYRuPEGLJkjZZWv0ldaxTt/YQZi4+x+lFYdpGRTr9ZmHmApueT6Zs39PktfIzTWrtZiX2LdTwxhlk6yn4aPGzFKgW4H+F1uj7j3vJaiVlY7W2FojS4c=
+    file_glob: true
+    file: products/*
+    skip_cleanup: true
+    on:
+        repo: MikeInnes/BinaryenBuilder
+        tags: true
